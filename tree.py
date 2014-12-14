@@ -15,7 +15,7 @@ SEP = ','
 MISSING = '?'
 
 CLASSES = ['democrat', 'republican']
-VALUES = ['n', 'y']
+VALUES = ['y', 'n']
 
 TREE_GRID = 60
 TREE_SPACING = 10
@@ -52,8 +52,8 @@ def count(data, attr=RESULT_IDX):
     return Counter(record[attr] for record in data)
 
 
-def entropy(data):
-    v = count(data).values()  # count democrats and republicans
+def entropy(data, attr=RESULT_IDX):
+    v = count(data, attr).values()  # count democrats and republicans
     ent, total = 0.0, len(data)
 
     for vk in v:
@@ -93,6 +93,22 @@ class Node(object):
             result += tree.right.to_string(indent + '   ')
             return result
 
+    def prune(tree, min_gain):
+        if not tree.left.leaves:
+            tree.left.prune(min_gain)
+        if not tree.right.leaves:
+            tree.right.prune(min_gain)
+
+        if tree.left.leaves and tree.right.leaves:
+            left = [[v] * c for v, c in tree.left.leaves.items()]
+            right = [[v] * c for v, c in tree.right.leaves.items()]
+            delta = entropy(left + right, 0)
+            delta -= float(entropy(left, 0) + entropy(right, 0)) / 2
+            if delta < min_gain:
+                tree.left, tree.right = None, None
+                tree.leaves = count(left + right, 0)
+        return tree
+
     def classify(tree, observation):
         """Classify the observation using the decision tree."""
         if tree.leaves:
@@ -131,7 +147,7 @@ class Node(object):
 
     def to_image(tree):
         """Draw the tree onto an image."""
-        width = tree.get_width() * TREE_GRID
+        width = tree.get_width() * TREE_GRID + TREE_SPACING
         height = (tree.get_height() + 1) * TREE_GRID + TREE_SPACING
 
         im = Image.new('L', (width, height), WHITE)
@@ -212,12 +228,20 @@ def plurality(counter):
 
 
 def main():
+    print 'before pruning:'
     tree = build_tree(train_data)
     check = [record[RESULT_IDX] == plurality(tree.classify(record))
              for record in test_data]
     print Counter(check)
     tree.to_image().save('tree.png')
+    print tree
 
+    print 'after pruning:'
+    tree.prune(0.1)
+    check = [record[RESULT_IDX] == plurality(tree.classify(record))
+             for record in test_data]
+    print Counter(check)
+    tree.to_image().save('tree2.png')
 
 if __name__ == "__main__":
     main()

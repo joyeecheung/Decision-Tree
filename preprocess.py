@@ -9,7 +9,7 @@ from collections import Counter
 RESULT_IDX = 0
 SEP = ','
 
-TEST_PROP = 0.5  # proportion of test set
+TEST_PROP = 0.2  # proportion of test set
 MISSING_SYMBOL = '?'
 
 dataset_filename = 'dataset.txt'
