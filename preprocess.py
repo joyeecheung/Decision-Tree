@@ -44,29 +44,6 @@ def split_by_result(data):
     return splited
 
 
-def fix_missing_data(data):
-    fixed = deepcopy(data)
-    attr_list = list(xrange(len(data[0])))
-    del attr_list[RESULT_IDX]
-    splited = split_by_result(data)
-
-    guess = {}
-    for group in splited:
-        for attr in attr_list:
-            counter = Counter(record[attr] for record in data
-                              if record[RESULT_IDX] == group)
-            guess.setdefault(group, {})
-            guess[group][attr] = counter.most_common()[0][0]
-
-    for record in fixed:
-        group = record[RESULT_IDX]
-        for attr in attr_list:
-            if record[attr] == MISSING_SYMBOL:
-                record[attr] = guess[group][attr]
-
-    return fixed
-
-
 def main():
     # parse the file and sample
     training_set, test_set = sample(parse(file(dataset_filename)))
