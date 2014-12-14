@@ -8,12 +8,13 @@ from collections import Counter
 
 RESULT_IDX = 0
 SEP = ','
-filename = 'dataset.txt'
-TEST_PROP = 0.1
+
+TEST_PROP = 0.5  # proportion of test set
 MISSING_SYMBOL = '?'
-RESULTS = ['democrat', 'republican']
-train_file = file('training.json', 'w')
-test_file = file('test.json', 'w')
+
+dataset_filename = 'dataset.txt'
+train_filename = 'training.json'
+test_filename = 'test.json'
 
 
 def parse(data):
@@ -21,12 +22,12 @@ def parse(data):
         yield line.strip().split(SEP)
 
 
-def divide(data):
+def sample(data, test_prop=TEST_PROP):
     training_set = []
     test_set = []
 
     for record in data:
-        if random() < TEST_PROP:
+        if random() < test_prop:
             test_set.append(record)
         else:
             training_set.append(record)
@@ -67,21 +68,27 @@ def fix_missing_data(data):
 
 
 def main():
-    training_set, test_set = divide(parse(file(filename)))
-    training_set = fix_missing_data(training_set)
-    train_file = file('training.json', 'w')
-    test_file = file('test.json', 'w')
-    json.dump(training_set, train_file)
-    json.dump(test_set, test_file)
+    # parse the file and sample
+    training_set, test_set = sample(parse(file(dataset_filename)))
 
-    train_file.close()
-    test_file.close()
+    # write to file as json
+    with file(train_filename, 'w') as train_file:
+        json.dump(training_set, train_file)
+        print 'Dumped training set to %s,' % train_filename,
+        print 'size', len(training_set)
+    with file(test_filename, 'w') as test_file:
+        json.dump(test_set, test_file)
+        print 'Dumped test set to %s,' % test_filename,
+        print 'size', len(test_set)
 
-    train_file = file('training.json', 'r')
-    test_file = file('test.json', 'r')
+    # write to file as json
+    with file(train_filename, 'r') as train_file:
+        assert json.load(train_file) == training_set
+        print 'Training file check OK.'
+    with file(test_filename, 'r') as test_file:
+        assert json.load(test_file) == test_set
+        print 'Test file check OK.'
 
-    print json.load(train_file) == training_set
-    print json.load(test_file) == test_set
 
 if __name__ == "__main__":
     main()
