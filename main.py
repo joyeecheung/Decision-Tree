@@ -26,6 +26,8 @@ def main():
         x.append(len(train_set))
         y.append(precision)
 
+    xy = sorted(zip(x, y), key=lambda a: a[0])
+    x, y = zip(*xy)
     plt.plot(x, y)
     plt.ylim((0.0, 1.0))
     plt.title('Learning Curve')
