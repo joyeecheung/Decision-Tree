@@ -26,7 +26,7 @@ LINE_HEIGHT = 18
 train_data = json.load(file('training.json'))
 test_data = json.load(file('test.json'))
 
-font = ImageFont.truetype('Arial.ttf', LINE_HEIGHT)
+font = ImageFont.truetype('times.ttf', LINE_HEIGHT)
 abbr = {'republican': 'R', 'democrat': 'D'}
 
 ##################################################
@@ -62,7 +62,7 @@ def entropy(data, attr=RESULT_IDX):
     return ent
 
 
-class Node(object):
+class DecisionTree(object):
 
     """Decision tree node."""
 
@@ -187,7 +187,7 @@ def build_tree(data, attr_list=None, score=entropy):
     """Build the decision tree from data."""
     # empty data
     if len(data) == 0:
-        return Node()
+        return DecisionTree()
 
     current_score = score(data)
     best_gain, best_criteria, best_sets = 0.0, None, None
@@ -216,10 +216,10 @@ def build_tree(data, attr_list=None, score=entropy):
         attr_list.remove(best_criteria[0])
         left = build_tree(best_sets[0], list(attr_list))
         right = build_tree(best_sets[1], list(attr_list))
-        return Node(best_criteria[0], best_criteria[1],
-                    left, right, count=len(data))
+        return DecisionTree(best_criteria[0], best_criteria[1],
+                            left, right, count=len(data))
     else:  # all tested
-        return Node(leaves=count(data), count=len(data))
+        return DecisionTree(leaves=count(data), count=len(data))
 
 
 def plurality(counter):
@@ -236,12 +236,14 @@ def main():
     tree.to_image().save('tree.png')
     print tree
 
+    print '----------------------'
     print 'after pruning:'
     tree.prune(0.1)
     check = [record[RESULT_IDX] == plurality(tree.classify(record))
              for record in test_data]
     print Counter(check)
     tree.to_image().save('tree2.png')
+    print tree
 
 if __name__ == "__main__":
     main()
