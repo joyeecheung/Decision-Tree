@@ -6,6 +6,7 @@ from math import log
 from PIL import Image, ImageDraw, ImageFont
 import json
 
+from util import get_filenames
 from preprocess import parse, sample
 
 ############### configuration ##############
@@ -23,11 +24,13 @@ BLACK = 0
 WHITE = 255
 LINE_HEIGHT = 18
 
-train_data = json.load(file('training.json'))
-test_data = json.load(file('test.json'))
+try:  # try to use the font
+    FONT = ImageFont.truetype('times.ttf', LINE_HEIGHT)
+except:
+    FONT = None
 
-font = ImageFont.truetype('times.ttf', LINE_HEIGHT)
-abbr = {'republican': 'R', 'democrat': 'D'}
+
+ABBR = {'republican': 'R', 'democrat': 'D'}
 
 ##################################################
 
@@ -160,9 +163,9 @@ class DecisionTree(object):
         """Draw the tree onto the draw object."""
         if tree.leaves:
             for idx, key in enumerate(tree.leaves):
-                result = abbr[key] + ':' + str(tree.leaves[key])
+                result = ABBR[key] + ':' + str(tree.leaves[key])
                 draw.text((x, y + idx * LINE_HEIGHT),
-                          result, BLACK, font=font)
+                          result, BLACK, font=FONT)
         else:
             width_left = tree.left.get_width() * TREE_GRID
             width_right = tree.right.get_width() * TREE_GRID
@@ -172,7 +175,7 @@ class DecisionTree(object):
 
             draw.text((x - TREE_SPACING, y - TREE_SPACING),
                       str(tree.attr) + ':' + str(tree.value),
-                      BLACK, font=font)
+                      BLACK, font=FONT)
 
             draw.line((x, y, center_left, y + TREE_GRID),
                       fill=BLACK)
@@ -193,7 +196,7 @@ def build_tree(data, attr_list=None, score=entropy):
     best_gain, best_criteria, best_sets = 0.0, None, None
 
     if attr_list is None:
-        attr_list = list(xrange(len(data[0])))
+        attr_list = range(len(data[0]))
         del attr_list[RESULT_IDX]
     value = VALUES[0]
 
@@ -228,22 +231,28 @@ def plurality(counter):
 
 
 def main():
-    print 'before pruning:'
+    files = get_filenames()
+    train_data = json.load(file(files.train))
+    test_data = json.load(file(files.test))
+
+    print 'Before pruning:'
     tree = build_tree(train_data)
     check = [record[RESULT_IDX] == plurality(tree.classify(record))
              for record in test_data]
+    tree.to_image().save(files.tree)
     print Counter(check)
-    tree.to_image().save('tree.png')
-    print tree
-
+    print 'Saved tree plot to', files.tree
     print '----------------------'
-    print 'after pruning:'
+
+    print 'After pruning:'
     tree.prune(0.1)
     check = [record[RESULT_IDX] == plurality(tree.classify(record))
              for record in test_data]
+    tree.to_image().save(files.pruned_tree)
     print Counter(check)
-    tree.to_image().save('tree2.png')
-    print tree
+    print 'Saved pruned tree plot to', files.pruned_tree
+    print '----------------------'
+
 
 if __name__ == "__main__":
     main()
