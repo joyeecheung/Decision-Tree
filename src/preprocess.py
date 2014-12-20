@@ -12,7 +12,7 @@ from util import get_filenames
 RESULT_IDX = 0
 SEP = ','
 
-TEST_PROP = 0.8  # sampling probability of test set
+TRAIN_PROP = 0.5  # sampling probability of test set
 MISSING_SYMBOL = '?'
 
 
@@ -21,15 +21,15 @@ def parse(data):
         yield line.strip().split(SEP)
 
 
-def sample(data, test_prop=TEST_PROP):
+def sample(data, train_prop=TRAIN_PROP):
     training_set = []
     testing_set = []
 
     for record in data:
-        if random() < test_prop:
-            testing_set.append(record)
-        else:
+        if random() < train_prop:
             training_set.append(record)
+        else:
+            testing_set.append(record)
 
     return training_set, testing_set
 
@@ -47,7 +47,7 @@ def main():
     # get command line arguments
     parser = argparse.ArgumentParser()
     parser.add_argument("-p", "--probability",
-                        type=float, default=TEST_PROP)
+                        type=float, default=TRAIN_PROP)
     args = parser.parse_args()
 
     # parse the file and sample
