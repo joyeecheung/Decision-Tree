@@ -17,11 +17,18 @@ MISSING_SYMBOL = '?'
 
 
 def parse(data):
+    """Parse the data. Return an iterator."""
     for line in data:
         yield line.strip().split(SEP)
 
 
 def sample(data, train_prop=TRAIN_PROP):
+    """Split the data by sampling training set with probability `train_prop`.
+       The rest will be put into training set.
+
+       Return
+       -------
+       training_set, testing_set."""
     training_set = []
     testing_set = []
 
@@ -32,15 +39,6 @@ def sample(data, train_prop=TRAIN_PROP):
             testing_set.append(record)
 
     return training_set, testing_set
-
-
-def split_by_result(data):
-    splited = {}
-    for record in data:
-        result = record[RESULT_IDX]
-        splited.setdefault(result, [])
-        splited[result].append(record)
-    return splited
 
 
 def main():

@@ -82,6 +82,7 @@ class DecisionTree(object):
         return self.to_string()
 
     def to_string(tree, indent=''):
+        """String representation of the tree."""
         result = ''
         if tree.leaves:
             return result + str(tree.leaves) + '\n'
@@ -97,6 +98,8 @@ class DecisionTree(object):
             return result
 
     def prune(tree, min_gain):
+        """Prune the branches/leaves with information gain
+           less than a given `min_gain`."""
         if not tree.left.leaves:
             tree.left.prune(min_gain)
         if not tree.right.leaves:
@@ -105,11 +108,12 @@ class DecisionTree(object):
         if tree.left.leaves and tree.right.leaves:
             left = [[v] * c for v, c in tree.left.leaves.items()]
             right = [[v] * c for v, c in tree.right.leaves.items()]
-            delta = entropy(left + right, 0)
-            delta -= float(entropy(left, 0) + entropy(right, 0)) / 2
+            delta = entropy(left + right, RESULT_IDX)
+            delta -= float(entropy(left, RESULT_IDX)
+                           + entropy(right, RESULT_IDX)) / 2
             if delta < min_gain:
                 tree.left, tree.right = None, None
-                tree.leaves = count(left + right, 0)
+                tree.leaves = count(left + right, RESULT_IDX)
         return tree
 
     def classify(tree, observation):
@@ -167,36 +171,44 @@ class DecisionTree(object):
                 draw.text((x, y + idx * LINE_HEIGHT),
                           result, BLACK, font=FONT)
         else:
+            # determine the position of each branch
             width_left = tree.left.get_width() * TREE_GRID
             width_right = tree.right.get_width() * TREE_GRID
 
             center_left = x - width_right / 2
             center_right = x + width_left / 2
 
+            # annotaion
             draw.text((x - TREE_SPACING, y - TREE_SPACING),
                       str(tree.attr) + ':' + str(tree.value),
                       BLACK, font=FONT)
 
+            # draw the stem
             draw.line((x, y, center_left, y + TREE_GRID),
                       fill=BLACK)
             draw.line((x, y, center_right, y + TREE_GRID),
                       fill=BLACK)
 
+            # draw each branch
             tree.left.draw_node(draw, center_left, y + TREE_GRID)
             tree.right.draw_node(draw, center_right, y + TREE_GRID)
 
 
 def info_gain(data, set1, set2, data_ent):
+    """Calculate the information gain by
+       splitting `data` into `set1` and `set2`."""
     p = float(len(set1)) / len(data)
     remainder = p * entropy(set1) + (1 - p) * entropy(set2)
     return data_ent - remainder
 
 
 def gain_ratio(data, set1, set2, data_ent):
+    """Calculate the normalized information gain by
+       splitting `data` into `set1` and `set2`."""
     p = float(len(set1)) / len(data)
     remainder = p * entropy(set1) + (1 - p) * entropy(set2)
     gain = data_ent - remainder
-    split_info = p * log(p) + (1-p)*log(p)
+    split_info = p * log(p) + (1 - p) * log(p)
     return gain / -split_info
 
 

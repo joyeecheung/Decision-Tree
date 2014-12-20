@@ -13,6 +13,7 @@ PRUNED_TREE_PLOT = 'pruned-tree.png'
 
 
 def get_filenames():
+    """Return a named tuple of filenames(absolute filepath)."""
     file_dir = os.path.dirname(os.path.realpath(__file__))
     parent_dir, _ = os.path.split(file_dir)
     asset_path = os.path.join(parent_dir, 'asset')
