@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 from collections import namedtuple
-import argparse
 import os
 
 DATASET_FILE = 'dataset.txt'

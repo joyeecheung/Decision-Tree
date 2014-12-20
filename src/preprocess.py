@@ -5,13 +5,14 @@ import json
 from copy import deepcopy
 from random import random
 from collections import Counter
+import argparse
 
 from util import get_filenames
 
 RESULT_IDX = 0
 SEP = ','
 
-TEST_PROP = 0.5  # proportion of test set
+TEST_PROP = 0.8  # sampling probability of test set
 MISSING_SYMBOL = '?'
 
 
@@ -43,9 +44,16 @@ def split_by_result(data):
 
 
 def main():
-    files = get_filenames()
+    # get command line arguments
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-p", "--probability",
+                        type=float, default=TEST_PROP)
+    args = parser.parse_args()
+
     # parse the file and sample
-    training_set, test_set = sample(parse(file(files.dataset)))
+    files = get_filenames()
+    data_parser = parse(file(files.dataset))
+    training_set, test_set = sample(data_parser, args.probability)
 
     # write to file as json
     with file(files.train, 'w') as train_file:
@@ -57,7 +65,7 @@ def main():
         print 'Dumped test set to %s,' % files.test,
         print 'size', len(test_set)
 
-    # write to file as json
+    # check the file is written correctly
     with file(files.train, 'r') as train_file:
         assert json.load(train_file) == training_set
         print 'Training file check OK.'

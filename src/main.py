@@ -5,7 +5,6 @@ from collections import Counter
 
 import matplotlib.pyplot as plt
 from numpy import arange
-from scipy.interpolate import interp1d
 
 from util import get_filenames
 from preprocess import parse, sample
@@ -39,9 +38,9 @@ def main():
     plt.plot(x, y)
     plt.ylim((0.0, 1.0))
     plt.title('Learning Curve')
-    plt.xlabel('Sample size')
+    plt.xlabel('Training set size')
 
-    plt.ylabel('Precision')
+    plt.ylabel('Precision on test set')
     plt.savefig(files.curve)
 
 if __name__ == "__main__":
