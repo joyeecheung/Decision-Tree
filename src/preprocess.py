@@ -23,15 +23,15 @@ def parse(data):
 
 def sample(data, test_prop=TEST_PROP):
     training_set = []
-    test_set = []
+    testing_set = []
 
     for record in data:
         if random() < test_prop:
-            test_set.append(record)
+            testing_set.append(record)
         else:
             training_set.append(record)
 
-    return training_set, test_set
+    return training_set, testing_set
 
 
 def split_by_result(data):
@@ -53,7 +53,7 @@ def main():
     # parse the file and sample
     files = get_filenames()
     data_parser = parse(file(files.dataset))
-    training_set, test_set = sample(data_parser, args.probability)
+    training_set, testing_set = sample(data_parser, args.probability)
 
     # write to file as json
     with file(files.train, 'w') as train_file:
@@ -61,16 +61,16 @@ def main():
         print 'Dumped training set to %s,' % files.train,
         print 'size', len(training_set)
     with file(files.test, 'w') as test_file:
-        json.dump(test_set, test_file)
+        json.dump(testing_set, test_file)
         print 'Dumped test set to %s,' % files.test,
-        print 'size', len(test_set)
+        print 'size', len(testing_set)
 
     # check the file is written correctly
     with file(files.train, 'r') as train_file:
         assert json.load(train_file) == training_set
         print 'Training file check OK.'
     with file(files.test, 'r') as test_file:
-        assert json.load(test_file) == test_set
+        assert json.load(test_file) == testing_set
         print 'Test file check OK.'
 
 

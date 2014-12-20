@@ -186,14 +186,28 @@ class DecisionTree(object):
             tree.right.draw_node(draw, center_right, y + TREE_GRID)
 
 
-def build_tree(data, attr_list=None, score=entropy):
+def info_gain(data, set1, set2, data_ent):
+    p = float(len(set1)) / len(data)
+    remainder = p * entropy(set1) + (1 - p) * entropy(set2)
+    return data_ent - remainder
+
+
+def gain_ratio(data, set1, set2, data_ent):
+    p = float(len(set1)) / len(data)
+    remainder = p * entropy(set1) + (1 - p) * entropy(set2)
+    gain = data_ent - remainder
+    split_info = p * log(p) + (1-p)*log(p)
+    return gain / -split_info
+
+
+def build_tree(data, attr_list=None, measure=info_gain):
     """Build the decision tree from data."""
     # empty data
     if len(data) == 0:
         return DecisionTree()
 
-    current_score = score(data)
-    best_gain, best_criteria, best_sets = 0.0, None, None
+    data_ent = entropy(data)
+    best_score, best_criteria, best_sets = 0.0, None, None
 
     if attr_list is None:
         attr_list = range(len(data[0]))
@@ -202,20 +216,17 @@ def build_tree(data, attr_list=None, score=entropy):
 
     for attr in attr_list:
         set1, set2, all_missed = divide_bool(data, attr, value)
-        if all_missed:
-            gain = 0.0
+        if all_missed or len(set1) == 0 or len(set2) == 0:
+            score = 0.0
         else:
-            p = float(len(set1)) / len(data)
-            remainder = p * score(set1) + (1 - p) * score(set2)
-            gain = current_score - remainder
-
-        if (gain > best_gain and len(set1) > 0 and len(set2) > 0):
-            best_gain, best_criteria = gain, (attr, value)
-            best_sets = (set1, set2)
+            score = measure(data, set1, set2, data_ent)
+            if (score > best_score and len(set1) > 0 and len(set2) > 0):
+                best_score, best_criteria = score, (attr, value)
+                best_sets = (set1, set2)
 
     # create subbranches
     # when there are more attribute to test
-    if best_gain > 0 and len(attr_list) != 0 and best_sets:
+    if best_score > 0.0 and len(attr_list) != 0 and best_sets:
         attr_list.remove(best_criteria[0])
         left = build_tree(best_sets[0], list(attr_list))
         right = build_tree(best_sets[1], list(attr_list))

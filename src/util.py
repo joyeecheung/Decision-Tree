@@ -6,7 +6,7 @@ import os
 
 DATASET_FILE = 'dataset.txt'
 TRAIN_FILE = 'training.json'
-TEST_FILE = 'test.json'
+TEST_FILE = 'testing.json'
 CURVE_FIG = 'learning-curve.png'
 TREE_PLOT = 'tree.png'
 PRUNED_TREE_PLOT = 'pruned-tree.png'
