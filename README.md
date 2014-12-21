@@ -1,7 +1,9 @@
 ##Dependencies
-1. Numpy
+
+1. numpy
 2. matplotlib
 3. pillow
+4. scipy
 
 The source code can be run under windows or linux with python 2.7+ and the libraries above.
 
@@ -9,12 +11,12 @@ The source code can be run under windows or linux with python 2.7+ and the libra
 
     ./
     ├── doc
-    │   └── report.pdf  (the report)
+    │   └── report.pdf  (the report)
     ├── asset
-    │   ├── dataset.txt  (data set)
-    │   ├── learning-curve.png  (learning curve plot)
-    │   ├── pruned-tree.png  (visualization of the pruned decision tree)
-    │   └── tree.png  (visualization of the decision tree)
+    │   ├── dataset.txt  (data set)
+    │   ├── learning-curve.png  (learning curve plot)
+    │   ├── pruned-tree.png  (visualization of the pruned decision tree)
+    │   └── tree.png  (visualization of the decision tree)
     └── src
         ├── main.py  (generate the learning curve)
         ├── preprocess.py  (split the dataset and store them in json)
@@ -32,5 +34,6 @@ Note: python scripts should be run under the `src` directory. All images will be
 4. To generate the learning curve, run `python main.py`. The plot will be placed under `asset` named `learning-curve.png`
 
 ##About
+
 * [Github repository](https://github.com/joyeecheung/decision-tree.git)
 * Time: Dec. 2014
