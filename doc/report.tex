@@ -73,7 +73,7 @@ The data set is split by sampling the training set with a given probability $p$.
 
 The algorithm for building the decision tree is described in Algorithm~\ref{alg:build}.
 
-Since the decision tree built with this dataset won't be very deep (after all, there are only 16 attributes, and the dataset is fairly skewed), a recursive implementation is sufficient. Records with missing values of chosen attribute will be ignored when calculating the information gain.
+Since the decision tree built with this data set won't be very deep (after all, there are only 16 attributes, and the data set is fairly skewed), a recursive implementation is sufficient. Records with missing values of the chosen attribute will be ignored when calculating the information gain.
 
 \begin{algorithm}[H]
 \centering
@@ -113,7 +113,7 @@ Since the decision tree built with this dataset won't be very deep (after all, t
 
 \begin{description}
 \item Remark 1. \hfill \\
-The \textit{entropy} of a attribute $V$ in the dataset $D$ is defined as:
+The \textit{entropy} of a attribute $V$ in the data set $D$ is defined as:
 
 $$
 H(V, D) = -\sum_k P(v_k) \log_2\frac{1}{P(v_k)}
@@ -122,7 +122,7 @@ $$
 where $v_k$ are values of $V$ in $D$, $P(v_k)$ is the probability of $v_k$ in $D$.
 
 \item Remark 2.\hfill \\
-When a dataset $D$ with goal attribute $V$ is split into subsets $D_k$ using attribute $A$, each with $n_k$ records, the \textit{information gain} is defined as:
+When a data set $D$ with goal attribute $V$ is split into subsets $D_k$ using attribute $A$, each with $n_k$ records, the \textit{information gain} is defined as:
 
 $$
 Gain(A) = H(V, D) - Remainder(A)
@@ -139,7 +139,7 @@ $P(n_k)$ is the proportion of $E_k$ in $D$.
 
 \subsection{Decision tree pruning}
 
-The algorithm for pruning the decision tree is described in Algorithm~\ref{alg:prune}. For the same reason as the tree building, a recursive implementation is enough. Nonetheless, since the dataset is quite skewed, there is seldom a need for pruning the tree.
+The algorithm for pruning the decision tree is described in Algorithm~\ref{alg:prune}. For the same reason as the tree building, a recursive implementation is enough. Nonetheless, since the data set is quite skewed, there is seldom a need for pruning the tree.
 
 \begin{algorithm}[H]
 \centering
@@ -203,7 +203,7 @@ The algorithm for classifying an observation is described in Algorithm~\ref{alg:
 
 \section{Experiment Result}
 
-To evaluate the implementation, we sample the data with probability $p$ and use the sample as training set. The rest of the dataset will be the testing set. One of the decision tree built with $p = 0.2$ is visualized in Figure~\ref{fig:tree}. In addition, we take training sets sampled with various $p$ to generate the learning curve for evaluation, as shown in Figure~\ref{fig:curve}. With training sets of different sizes, the precisions of cross validation fluctuate between $0.9$ and $1.0$, with mean $\mu = 0.9462$ and standard variation $\sigma = 0.0175$.
+To evaluate the implementation, we sample the data with probability $p$ and use the sample as training set. The rest of the data set will be the testing set. One of the decision tree built with $p = 0.2$ is visualized in Figure~\ref{fig:tree}. In addition, we take training sets sampled with various $p$ to generate the learning curve for evaluation, as shown in Figure~\ref{fig:curve}. With training sets of different sizes, the precisions of cross validation fluctuate between $0.9$ and $1.0$, with mean $\mu = 0.9462$ and standard variation $\sigma = 0.0175$.
 
 \begin{figure}[H]
 \centering
