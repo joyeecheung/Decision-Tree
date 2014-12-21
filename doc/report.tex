@@ -1,6 +1,6 @@
 \documentclass{article}
-%\usepackage[a4paper,margin=2.2cm,footskip=.5cm]{geometry}
-\usepackage{fullpage}
+\usepackage[a4paper,top=0.75in, bottom=0.75in, left=1in, right=1in,footskip=0.2in]{geometry}
+%\usepackage{fullpage}
 %-----------------Hyperlink Packages--------------------
 \usepackage{hyperref}
 \hypersetup{
@@ -11,8 +11,6 @@
 }
 %-----------------Figure Packages--------------------
 \usepackage{graphicx}                       % For figures
-\usepackage{stfloats}
-\usepackage[tight,footnotesize]{subfigure}  % Create subfigures, ie 1A, 1B
 %\usepackage{epsfig} % for postscript graphics files
 %------------------Math Packages------------------------
 \usepackage{amssymb,amsmath}
@@ -33,7 +31,6 @@
 \title{}
 
 \begin{document}
-\bibliographystyle{acm}
 
 \title{
 Artificial Intelligence Project 2 \\
@@ -69,16 +66,20 @@ Given this dataset, the goal is to build a decision tree to classify a record (t
 
 For this project we implemented the C4.5 algorithm to build the decision tree. Since the dataset only have two effective values (`y' and `n') for all attributes, there is no need to use the information gain ratio as the measure of attributes. The information gain alone is more suitable for this dataset.
 
-To handle missing data, when building the tree, we only consider the records with defined value for the attribute being measured. When classifying the record, we use the probability of each possible value to weigh the calculation of each branch.
+To handle the missing data, when building the tree, we only consider the records with defined value for the attribute being measured. When classifying the record, we use the probability of each possible value to weigh the calculation of each branch.
 
 The data set is split by sampling the training set with a given probability $p$. The rest of the data will be put in to the testing set.
 
 \subsection{Decision tree building}
 
+The algorithm for building the decision tree is described in Algorithm~\ref{alg:build}.
+
+Since the decision tree built with this dataset won't be very deep (after all, there are only 16 attributes, and the dataset is fairly skewed), a recursive implementation is sufficient. Records with missing values of chosen attribute will be ignored when calculating the information gain.
+
 \begin{algorithm}[H]
 \centering
 \caption{Decision tree bulding}
-\label{alg:icm}
+\label{alg:build}
   \begin{algorithmic}[1]
     \Function{Build}{$data$, $attributes$}
         \If{$data$ is empty}
@@ -111,9 +112,37 @@ The data set is split by sampling the training set with a given probability $p$.
   \end{algorithmic}
 \end{algorithm}
 
+\begin{description}
+\item Remark 1. \hfill \\
+The \textit{entropy} of a attribute $V$ in the dataset $D$ is defined as:
+
+$$
+H(V, D) = -\sum_k P(v_k) \log_2\frac{1}{P(v_k)}
+$$
+
+where $v_k$ are values of $V$ in $D$, $P(v_k)$ is the probability of $v_k$ in $D$.
+
+\item Remark 2.\hfill \\
+When a dataset $D$ with goal attribute $V$ is split into subsets $D_k$ using attribute $A$, each with $n_k$ records, the \textit{information gain} is defined as:
+
+$$
+Gain(A) = H(V, D) - Remainder(A)
+$$
+
+where
+
+$$
+Remainder(A) = \sum_k P(n_k) H(V, D_k)
+$$
+
+$P(n_k)$ is the proportion of $E_k$ in $D$.
+\end{description}
+
 \subsection{Decision tree pruning}
 
-\begin{algorithm}
+The algorithm for pruning the decision tree is described in Algorithm~\ref{alg:prune}. For the same reason as the tree building, a recursive implementation is enough. Nonetheless, since the dataset is quite skewed, there is seldom a need for pruning the tree.
+
+\begin{algorithm}[H]
 \centering
 \caption{Decision tree pruning}
 \label{alg:prune}
@@ -138,7 +167,9 @@ The data set is split by sampling the training set with a given probability $p$.
 
 \subsection{Classification}
 
-\begin{algorithm}
+The algorithm for classifying an observation is described in Algorithm~\ref{alg:cla}. It follows all branches at any node for which a value is missing and multiply the weights along each path.
+
+\begin{algorithm}[H]
 \centering
 \caption{Classification}
 \label{alg:cla}
@@ -173,11 +204,13 @@ The data set is split by sampling the training set with a given probability $p$.
 
 \section{Experiment Result}
 
+To evaluate the implementation, we sample the data with probability $p$ and use the sample as training set. The rest of the dataset will be the testing set. One of the decision tree built with $p = 0.2$ is visualized in Figure~\ref{fig:tree}. In addition, we take training sets sampled with various $p$ to generate the learning curve for evaluation, as shown in Figure~\ref{fig:curve}. With training sets of different sizes, the precisions of cross validation fluctuate between $0.9$ and $1.0$, with mean $\mu = 0.9462$ and standard variation $\sigma = 0.0175$.
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=400pt]{../asset/tree.png}
 \caption{One of the decision trees built with training set sampled with $p = 0.5$}
+\label{fig:tree}
 \end{figure}
 
 \begin{figure}[H]
@@ -187,11 +220,4 @@ The data set is split by sampling the training set with a given probability $p$.
 \label{fig:curve}
 \end{figure}
 
-The learning curve is shown in Figure~\ref{fig:curve}. With training sets of different sizes, the precisions of cross validation fluctuate between $0.9$ and $1.0$, with mean $\mu = 0.9414$ and standard variation $\sigma = 0.0203$.
-
-\section{Discussion}
-
-
-
-\bibliography{denoise}
 \end{document}
